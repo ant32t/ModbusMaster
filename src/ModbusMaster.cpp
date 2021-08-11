@@ -874,3 +874,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   _u8ResponseBufferIndex = 0;
   return u8MBStatus;
 }
+
+void ModbusMaster::setTimeout(uint16_t time) {
+    ku16MBResponseTimeout = time;
+}
