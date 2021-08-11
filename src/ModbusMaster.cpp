@@ -723,6 +723,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   
   // loop until we run out of time or bytes, or an error occurs
   u32StartTime = millis();
+  bool ignoring_nulls = true;
   while (u8BytesLeft && !u8MBStatus)
   {
     if (_serial->available())
@@ -730,6 +731,14 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
 #if __MODBUSMASTER_DEBUG__
       digitalWrite(__MODBUSMASTER_DEBUG_PIN_A__, true);
 #endif
+      // ignore 0x0 bytes at the start of message
+      if (ignoring_nulls) {
+        if (_serial->peek() == 0) {
+          _serial->read();
+          continue;
+        }
+        ignoring_nulls = false;
+      }
       u8ModbusADU[u8ModbusADUSize++] = _serial->read();
       u8BytesLeft--;
 #if __MODBUSMASTER_DEBUG__
